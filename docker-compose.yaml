@@ -4,12 +4,12 @@ services:
     container_name: rabbit1
     hostname: rabbit1
     ports:
-      - "5672:5672"
       - "15672:15672"
     environment:
       RABBITMQ_NODENAME: rabbit@rabbit1
-      RABBITMQ_DEFAULT_USER: admin
-      RABBITMQ_DEFAULT_PASS: admin123
+      RABBITMQ_DEFAULT_USER: ${RABBIT_USERNAME}
+      RABBITMQ_DEFAULT_PASS: ${RABBIT_PASSWORD}
+      RABBITMQ_ERLANG_COOKIE: ${ERLANG_COOKIE}
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
       interval: 10s
@@ -17,8 +17,7 @@ services:
       retries: 10
     volumes:
       - rabbit1_data:/var/lib/rabbitmq
-      - ./erlang.cookie:/var/lib/rabbitmq/.erlang.cookie:ro
-      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
     networks:
       - rabbitmq_net
 
@@ -28,17 +27,22 @@ services:
     hostname: rabbit2
     environment:
       RABBITMQ_NODENAME: rabbit@rabbit2
-      RABBITMQ_DEFAULT_USER: admin
-      RABBITMQ_DEFAULT_PASS: admin123
+      RABBITMQ_DEFAULT_USER: ${RABBIT_USERNAME}
+      RABBITMQ_DEFAULT_PASS: ${RABBIT_PASSWORD}
+      RABBITMQ_ERLANG_COOKIE: ${ERLANG_COOKIE}
     volumes:
       - rabbit2_data:/var/lib/rabbitmq
-      - ./erlang.cookie:/var/lib/rabbitmq/.erlang.cookie:ro
-      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
     networks:
       - rabbitmq_net
     depends_on:
       rabbit1:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   rabbit3:
     image: rabbitmq:4-management
@@ -46,16 +50,38 @@ services:
     hostname: rabbit3
     environment:
       RABBITMQ_NODENAME: rabbit@rabbit3
-      RABBITMQ_DEFAULT_USER: admin
-      RABBITMQ_DEFAULT_PASS: admin123
+      RABBITMQ_DEFAULT_USER: ${RABBIT_USERNAME}
+      RABBITMQ_DEFAULT_PASS: ${RABBIT_PASSWORD}
+      RABBITMQ_ERLANG_COOKIE: ${ERLANG_COOKIE}
     volumes:
       - rabbit3_data:/var/lib/rabbitmq
-      - ./erlang.cookie:/var/lib/rabbitmq/.erlang.cookie:ro
-      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
     networks:
       - rabbitmq_net
     depends_on:
       rabbit1:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+  
+  rabbitmq-lb:
+    image: haproxy:lts
+    container_name: rabbitmq-lb
+    ports:
+      - "5672:5672" 
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+    networks:
+      - rabbitmq_net
+    depends_on:
+      rabbit1:
+        condition: service_healthy
+      rabbit2:
+        condition: service_healthy
+      rabbit3:
         condition: service_healthy
 
 networks:
