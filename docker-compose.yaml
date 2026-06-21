@@ -1,0 +1,68 @@
+services:
+  rabbit1:
+    image: rabbitmq:4-management
+    container_name: rabbit1
+    hostname: rabbit1
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_NODENAME: rabbit@rabbit1
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin123
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - rabbit1_data:/var/lib/rabbitmq
+      - ./erlang.cookie:/var/lib/rabbitmq/.erlang.cookie:ro
+      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+    networks:
+      - rabbitmq_net
+
+  rabbit2:
+    image: rabbitmq:4-management
+    container_name: rabbit2
+    hostname: rabbit2
+    environment:
+      RABBITMQ_NODENAME: rabbit@rabbit2
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin123
+    volumes:
+      - rabbit2_data:/var/lib/rabbitmq
+      - ./erlang.cookie:/var/lib/rabbitmq/.erlang.cookie:ro
+      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+    networks:
+      - rabbitmq_net
+    depends_on:
+      rabbit1:
+        condition: service_healthy
+
+  rabbit3:
+    image: rabbitmq:4-management
+    container_name: rabbit3
+    hostname: rabbit3
+    environment:
+      RABBITMQ_NODENAME: rabbit@rabbit3
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin123
+    volumes:
+      - rabbit3_data:/var/lib/rabbitmq
+      - ./erlang.cookie:/var/lib/rabbitmq/.erlang.cookie:ro
+      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+    networks:
+      - rabbitmq_net
+    depends_on:
+      rabbit1:
+        condition: service_healthy
+
+networks:
+  rabbitmq_net:
+    driver: bridge
+
+volumes:
+  rabbit1_data:
+  rabbit2_data:
+  rabbit3_data:

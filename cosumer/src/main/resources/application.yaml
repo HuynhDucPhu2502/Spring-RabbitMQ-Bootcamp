@@ -1,3 +1,7 @@
 spring:
   application:
     name: cosumer
+  rabbitmq:
+    username: guest
+    password: guest
+    addresses: "localhost:5672"
