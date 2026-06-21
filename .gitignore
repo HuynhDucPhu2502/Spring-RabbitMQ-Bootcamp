@@ -1,0 +1,23 @@
+# Local secrets
+.env
+.env.*
+!.env.example
+
+# Runtime data and logs
+*.log
+data/
+prometheus-data/
+grafana-data/
+
+# Docker/compose temporary files
+*.tmp
+*.generated.yml
+
+# IDE/editor files
+.idea/
+.vscode/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
