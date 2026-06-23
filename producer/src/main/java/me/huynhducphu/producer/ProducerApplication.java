@@ -28,5 +28,7 @@ public class ProducerApplication implements CommandLineRunner {
 //            producerService.sendEmployeeInformation();
 //        }
 
+//        producerService.sendMessageTestFanout();
+        producerService.sendMessageTestDirect();
     }
 }

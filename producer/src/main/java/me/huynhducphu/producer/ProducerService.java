@@ -49,4 +49,15 @@ public class ProducerService {
         rabbitTemplate.convertAndSend("jsonQueue", payloadJson);
     }
 
+
+    public void sendMessageTestFanout() {
+        rabbitTemplate.convertAndSend("fanOutExchange", "", "Hello World");
+    }
+
+    public void sendMessageTestDirect() {
+        rabbitTemplate.convertAndSend("directExchange", "test.a", "test.a");
+        rabbitTemplate.convertAndSend("directExchange", "test.b", "test.b");
+        rabbitTemplate.convertAndSend("directExchange", "test.c", "test.c");
+    }
+
 }

@@ -37,4 +37,34 @@ public class ConsumerService {
         System.out.println(payload);
     }
 
+    @RabbitListener(queues = "queue.a")
+    public void testFanoutQueueA(String message) throws Exception {
+        System.out.println(message);
+    }
+
+    @RabbitListener(queues = "queue.b")
+    public void testFanoutQueueB(String message) throws Exception {
+        System.out.println(message);
+    }
+
+    @RabbitListener(queues = "queue.c")
+    public void testFanoutQueueC(String message) throws Exception {
+        System.out.println(message);
+    }
+
+    @RabbitListener(queues = "queue.1")
+    public void testDirectQueue1(String message) throws Exception {
+        System.out.println(message);
+    }
+
+    @RabbitListener(queues = "queue.2")
+    public void testDirectQueue2(String message) throws Exception {
+        System.out.println(message);
+    }
+
+    @RabbitListener(queues = "queue.3")
+    public void testDirectQueue3(String message) throws Exception {
+        System.out.println(message);
+    }
+
 }
