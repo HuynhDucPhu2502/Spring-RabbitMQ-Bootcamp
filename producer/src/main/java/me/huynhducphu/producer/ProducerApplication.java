@@ -23,5 +23,10 @@ public class ProducerApplication implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 //        producerService.sendHelloWorldViaRabbitMQ();
+
+//        for (int i = 0; i < 5; i++) {
+//            producerService.sendEmployeeInformation();
+//        }
+
     }
 }
